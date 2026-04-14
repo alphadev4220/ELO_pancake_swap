@@ -1,0 +1,25 @@
+{
+  "name": "Eloswap Default List",
+  "timestamp": "2026-04-14T00:00:00Z",
+  "version": {
+    "major": 1,
+    "minor": 0,
+    "patch": 0
+  },
+  "tokens": [
+    {
+      "name": "Wrapped ELO",
+      "symbol": "WELO",
+      "address": "0xD4949664cD82660AaE99bEdc034a0deA8A0bd517",
+      "chainId": 2188,
+      "decimals": 18
+    },
+    {
+      "name": "ELO USDT",
+      "symbol": "EUSDT",
+      "address": "0x0534eD51D85c8a46C51CfA708373DcB1DBd2fbFf",
+      "chainId": 2188,
+      "decimals": 6
+    }
+  ]
+}
