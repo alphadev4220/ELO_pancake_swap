@@ -11,7 +11,6 @@ import { Connector, useAccount, useConnect } from 'wagmi'
 import { legacyPreviouslyUsedWalletsAtom } from '@pancakeswap/ui-wallets'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { NonEVMChainId } from '@pancakeswap/chains'
-import { useSocialLoginProviderAtom } from '../../wallet/Privy/atom'
 
 interface CopyAddressProps extends FlexProps {
   account: string | undefined
@@ -143,7 +142,6 @@ export const CopyAddress: React.FC<React.PropsWithChildren<CopyAddressProps>> = 
 
   // TODO @ChefJerry, add previouslyUsedSolanaWalletsAtom support
   const [previouslyUsedEvmWalletsId] = useAtom(legacyPreviouslyUsedWalletsAtom)
-  const [socialProvider] = useSocialLoginProviderAtom()
 
   const walletConfig = walletsConfig({ chainId, connect: connectAsync })
 
@@ -157,13 +155,9 @@ export const CopyAddress: React.FC<React.PropsWithChildren<CopyAddressProps>> = 
     return evmWallet?.icon
   }, [walletConfig, chainId, solanaWalletIcon, previouslyUsedEvmWalletsId])
 
-  const socialIcon = useMemo(() => {
-    return socialProvider && isSmartAccount ? SOCIAL_LOGIN_ICONS[socialProvider] : null
-  }, [socialProvider, isSmartAccount])
+  const socialIcon = null
 
-  const needsWhiteBackground = useMemo(() => {
-    return Boolean(socialProvider && isSmartAccount && ['x', 'discord', 'telegram'].includes(socialProvider))
-  }, [socialProvider, isSmartAccount])
+  const needsWhiteBackground = false
 
   // Format the address to show only the first 6 and last 4 characters
   const formatAddress = (address: string | undefined) => {

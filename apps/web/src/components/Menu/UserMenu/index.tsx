@@ -24,7 +24,6 @@ import { SendGiftProvider, useSendGiftContext } from 'views/Gift/providers/SendG
 import { UnclaimedOnlyProvider } from 'views/Gift/providers/UnclaimedOnlyProvider'
 import { useAccount } from 'wagmi'
 import SolanaConnectButton from 'wallet/components/SolanaConnectButton'
-import { usePrivyWalletAddress } from 'wallet/Privy/hooks'
 
 import { isSolana, NonEVMChainId } from '@pancakeswap/chains'
 import { Trans, useTranslation } from '@pancakeswap/localization'
@@ -36,7 +35,6 @@ import {
   UserMenuVariant,
   useTooltip,
 } from '@pancakeswap/uikit'
-import { usePrivy } from '@privy-io/react-auth'
 import { useWallet } from '@solana/wallet-adapter-react'
 
 import { useWalletPanel } from '../WalletPanelContext'
@@ -116,22 +114,18 @@ const UserMenu = () => {
   const { t } = useTranslation()
   const { chainId, account: evmAccount, solanaAccount, isWrongNetwork } = useAccountActiveChain()
   const { connector } = useAccount()
-  const { ready, authenticated, user } = usePrivy()
   const isCakepadBaseRoute = useCakepadBaseExperience()
 
-  // Use new Privy wallet address hook to prevent flickering
-  const { address: privyAddress, isLoading: isPrivyAddressLoading, hasSetupFailed } = usePrivyWalletAddress()
-
-  // Determine which address to use: if Privy login use privyAddress, otherwise use account
+  // Determine which address to use: just use wagmi account directly
   const finalAddress = useMemo(() => {
-    if (ready && authenticated && user) return privyAddress
     if (chainId === NonEVMChainId.SOLANA && solanaAccount) return solanaAccount
     if (chainId !== NonEVMChainId.SOLANA && evmAccount) return evmAccount
 
     return evmAccount ?? solanaAccount ?? undefined
-  }, [ready, authenticated, user, privyAddress, evmAccount, solanaAccount, chainId])
+  }, [evmAccount, solanaAccount, chainId])
 
-  const shouldShowLoading = ready && authenticated && user ? isPrivyAddressLoading : false
+  const shouldShowLoading = false
+  const hasSetupFailed = false
   const currentAccount = chainId === NonEVMChainId.SOLANA ? solanaAccount ?? undefined : evmAccount
   const { domainName } = useDomainNameForAddress(chainId === NonEVMChainId.SOLANA ? undefined : currentAccount)
   const avatarSrc = useAvatar()
@@ -191,36 +185,10 @@ const UserMenu = () => {
     }, 120)
   }, [isMobile, clearHoverLeave, resetViewState, setCode])
   const { setView } = useMenuTab()
-  const [hasInitialized, setHasInitialized] = useState(false)
-
   // Show AA wallet setup failed state - moved to top level
   const { targetRef, tooltip, tooltipVisible } = useTooltip(t('Please refresh the page and try it again'), {
     placement: 'top',
   })
-
-  // Track if we should show error state
-  // Only show error after proper initialization and multiple failed attempts
-  useEffect(() => {
-    if (ready && authenticated && user) {
-      // Wait longer on first load to ensure AA wallet has time to setup
-      const delay = hasInitialized ? 1000 : 5000 // 5 seconds on first load, 1 second on subsequent
-      const timer = setTimeout(() => {
-        setHasInitialized(true)
-      }, delay)
-      return () => clearTimeout(timer)
-    }
-    // Reset when not authenticated
-    setHasInitialized(false)
-
-    return undefined
-  }, [ready, authenticated, user, hasInitialized])
-
-  // Reset hasInitialized when successfully connected to prevent false error states
-  useEffect(() => {
-    if (finalAddress && !isPrivyAddressLoading) {
-      setHasInitialized(false) // Reset so next login gets proper delay
-    }
-  }, [finalAddress, isPrivyAddressLoading])
 
   const ConnectBtn = useMemo(() => {
     if (chainId === NonEVMChainId.SOLANA) {
@@ -452,30 +420,6 @@ const UserMenu = () => {
           </ClickablePopover>
         )}
       </ClickableUserMenu>
-    )
-  }
-
-  // Only show failed state after proper initialization and when not loading
-  // This prevents flash on login and ensures the error is real
-  if (ready && authenticated && user && hasSetupFailed && hasInitialized && !isPrivyAddressLoading) {
-    if (isCakepadBaseRoute) {
-      return null
-    }
-
-    return (
-      <FlexGap gap="8px">
-        <Box ref={targetRef}>
-          <ConnectBtn scale="sm" variant="danger">
-            <Box display={['none', null, null, 'block']}>
-              <Trans>Failed to Connect</Trans>
-            </Box>
-            <Box display={['block', null, null, 'none']}>
-              <Trans>Failed</Trans>
-            </Box>
-          </ConnectBtn>
-        </Box>
-        {tooltipVisible && tooltip}
-      </FlexGap>
     )
   }
 

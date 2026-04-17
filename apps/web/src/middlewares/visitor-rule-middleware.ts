@@ -2,11 +2,13 @@ import { NextFetchEvent, NextResponse } from 'next/server'
 import { ExtendedNextReq, MiddlewareFactory, NextMiddleware } from './types'
 
 const CAKEPAD_HOST = 'cakepad.pancakeswap.finance'
+const ELOSWAP_HOST = 'eloswap.net'
 
 export const visitorRedirectMiddleware: MiddlewareFactory = (next: NextMiddleware) => {
   return async (request: ExtendedNextReq, _next: NextFetchEvent) => {
     const visited = request.cookies.get('visited')
     const isCakepadHost = request.nextUrl.hostname === CAKEPAD_HOST
+    const isEloswapHost = request.nextUrl.hostname === ELOSWAP_HOST
 
     if (isCakepadHost && request.nextUrl.pathname === '/') {
       const url = request.nextUrl.clone()

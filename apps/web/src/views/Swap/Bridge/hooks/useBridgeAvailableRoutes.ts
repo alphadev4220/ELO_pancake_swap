@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { CROSSCHAIN_SUPPORTED_CHAINS } from 'quoter/utils/crosschain-utils/config'
 import { ChainId, isSolana, NonEVMChainId } from '@pancakeswap/chains'
-import { usePrivyWalletAddress } from 'wallet/Privy/hooks/usePrivyWalletAddress'
 import { useExperimentalFeatureEnabled } from 'hooks/useExperimentalFeatureEnabled'
 import { EXPERIMENTAL_FEATURES } from 'config/experimentalFeatures'
 import { GetAvailableRoutesParams, getBridgeAvailableRoutes } from '../api'
@@ -19,7 +18,6 @@ function useBridgeAvailableRoutes() {
 
 export function useBridgeAvailableChains(params?: GetAvailableRoutesParams) {
   const { data, isLoading } = useBridgeAvailableRoutes()
-  const { address: privyAddress } = usePrivyWalletAddress()
   const isBridgeV2Enabled = useExperimentalFeatureEnabled(EXPERIMENTAL_FEATURES.BRIDGE_V2)
 
   // only return chains array,add origin chain id to the array
@@ -45,13 +43,12 @@ export function useBridgeAvailableChains(params?: GetAvailableRoutesParams) {
       ...(acrossSupportedChains.length > 0 && isBridgeV2Enabled ? [NonEVMChainId.SOLANA] : []),
       ...acrossSupportedChains,
     ]
-  }, [data, params?.originChainId, privyAddress, isBridgeV2Enabled])
+  }, [data, params?.originChainId, isBridgeV2Enabled])
 
   return useMemo(() => {
     return {
-      // if privy login, exclude zkSync because social login is not supported
-      chains: chains.filter((chain) => (privyAddress ? chain !== ChainId.ZKSYNC : true)),
+      chains,
       loading: isLoading,
     }
-  }, [chains, isLoading, privyAddress])
+  }, [chains, isLoading])
 }

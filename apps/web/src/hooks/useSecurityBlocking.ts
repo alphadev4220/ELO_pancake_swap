@@ -1,9 +1,9 @@
-import { usePrivy } from '@privy-io/react-auth'
 import { useEffect, useState } from 'react'
+import { useAccount } from 'wagmi'
 
 function useConnectedViaEmbeddedWallet() {
-  const { authenticated } = usePrivy()
-  return authenticated
+  const { isConnected } = useAccount()
+  return isConnected
 }
 
 export function useSecurityBlocking() {

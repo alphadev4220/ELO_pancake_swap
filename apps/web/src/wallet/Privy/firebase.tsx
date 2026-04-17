@@ -46,6 +46,7 @@ export function FirebaseAuthProvider({ children }: AuthProviderProps) {
 
   const signInWithGoogle = async (): Promise<UserCredential> => {
     try {
+      if (!firebaseApp) throw new Error('Firebase is not configured')
       const auth = getAuth(firebaseApp)
       const googleProvider = new GoogleAuthProvider()
       const res = await signInWithPopup(auth, googleProvider)
@@ -66,6 +67,7 @@ export function FirebaseAuthProvider({ children }: AuthProviderProps) {
 
   const signInWithX = async (): Promise<UserCredential> => {
     try {
+      if (!firebaseApp) throw new Error('Firebase is not configured')
       const auth = getAuth(firebaseApp)
       const twitterProvider = new TwitterAuthProvider()
       const res = await signInWithPopup(auth, twitterProvider)
@@ -132,6 +134,7 @@ export function FirebaseAuthProvider({ children }: AuthProviderProps) {
   const loginWithCustomToken = useCallback(
     async (customToken: string) => {
       try {
+        if (!firebaseApp) throw new Error('Firebase is not configured')
         setPrivySocialLogin(true)
         const auth = getAuth(firebaseApp)
         const userCredential = await signInWithCustomToken(auth, customToken)
@@ -192,6 +195,7 @@ export function FirebaseAuthProvider({ children }: AuthProviderProps) {
     if (token) {
       return token
     }
+    if (!firebaseApp) return undefined
     const auth = getAuth(firebaseApp)
     if (!auth.currentUser) {
       return undefined
@@ -202,6 +206,10 @@ export function FirebaseAuthProvider({ children }: AuthProviderProps) {
   }, [token])
 
   useEffect(() => {
+    if (!firebaseApp) {
+      setLoading(false)
+      return undefined
+    }
     const auth = getAuth(firebaseApp)
 
     // Handle auth state changes and set token
@@ -254,6 +262,7 @@ export function FirebaseAuthProvider({ children }: AuthProviderProps) {
   }, [])
 
   const signOutFirebase = useCallback(async () => {
+    if (!firebaseApp) return
     const auth = getAuth(firebaseApp)
     try {
       await signOut(auth)
@@ -301,7 +310,18 @@ export function FirebaseAuthProvider({ children }: AuthProviderProps) {
 export function useFirebaseAuth() {
   const context = useContext(AuthContext)
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider')
+    // Return no-op stubs when FirebaseAuthProvider is not in the tree
+    return {
+      token: undefined,
+      getToken: async () => undefined,
+      isLoading: false,
+      loginWithGoogle: async () => {},
+      loginWithX: async () => {},
+      loginWithDiscord: async () => {},
+      loginWithTelegram: async () => {},
+      loginWithCustomToken: async () => false,
+      signOutAndClearUserStates: async () => {},
+    } as AuthContextType
   }
   return context
 }
@@ -309,6 +329,7 @@ export function useFirebaseAuth() {
 // Function to retrigger Firebase auth for Privy
 export async function retriggerFirebaseAuth() {
   try {
+    if (!firebaseApp) return false
     const auth = getAuth(firebaseApp)
     const { currentUser } = auth
 

@@ -1,5 +1,6 @@
 export const CAKEPAD_HOST = 'cakepad.pancakeswap.finance'
 export const PANCAKESWAP_HOST = 'pancakeswap.finance'
+export const ELOSWAP_HOST = 'eloswap.net'
 
 export const BASE_APP_ID_BY_HOST: Record<string, string> = {
   [CAKEPAD_HOST]: '698194b61672d70694e293ea',
@@ -31,6 +32,20 @@ export const MINI_APP_EMBED_BY_HOST: Record<string, string> = {
         name: 'PancakeSwap',
         url: 'https://pancakeswap.finance',
         splashImageUrl: 'https://pancakeswap.finance/logo.png',
+        splashBackgroundColor: '#0f1220',
+      },
+    },
+  }),
+  [ELOSWAP_HOST]: JSON.stringify({
+    version: '1',
+    imageUrl: 'https://eloswap.net/logo.png',
+    button: {
+      title: 'Open Eloswap',
+      action: {
+        type: 'launch_frame',
+        name: 'Eloswap',
+        url: 'https://eloswap.net',
+        splashImageUrl: 'https://eloswap.net/logo.png',
         splashBackgroundColor: '#0f1220',
       },
     },

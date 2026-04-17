@@ -48,7 +48,7 @@ export async function getGasLimitOnChain({ chainId, client }: GetGasLimitOnChain
     const gasLeft = (await multicall.read.gasLeft()) as bigint
     return gasLeft
   } catch (error) {
-    console.warn('Failed to get gas limit from chain, using default:', error)
+    // gasLeft() may revert on some chains/RPCs - fallback to default is fine
     return BigInt(getDefaultGasLimit(chainId))
   }
 }

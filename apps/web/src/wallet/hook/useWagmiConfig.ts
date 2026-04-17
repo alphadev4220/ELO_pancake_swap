@@ -1,12 +1,30 @@
 import { isInBinance } from '@binance/w3w-utils'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { createW3WWagmiConfig, createWagmiConfig } from 'utils/wagmi'
 import { eip6963Providers } from 'wallet/WalletProvider'
 import { atom, useAtom } from 'jotai'
 
-export const wagmiConfigAtom = atom<any>(undefined)
+// Lazy singleton: created once on first access, stable across renders
+let singletonConfig: ReturnType<typeof createWagmiConfig> | null = null
+function getDefaultConfig() {
+  if (!singletonConfig) {
+    singletonConfig = createWagmiConfig()
+  }
+  return singletonConfig
+}
+
+export const wagmiConfigAtom = atom<any>(null)
 export const useWagmiConfig = () => {
   const [wagmiConfig, setWagmiConfig] = useAtom(wagmiConfigAtom)
+  // Use a ref to hold the stable config so it never changes between renders
+  const configRef = useRef(wagmiConfig ?? getDefaultConfig())
+
+  // Initialize atom once
+  useEffect(() => {
+    if (!wagmiConfig) {
+      setWagmiConfig(configRef.current)
+    }
+  }, [wagmiConfig, setWagmiConfig])
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined
@@ -32,7 +50,9 @@ export const useWagmiConfig = () => {
 
     const timer = setTimeout(() => {
       console.log(`[wallet] init wagmi config`)
-      setWagmiConfig(typeof window !== 'undefined' && isInBinance() ? createW3WWagmiConfig() : createWagmiConfig())
+      if (typeof window !== 'undefined' && isInBinance()) {
+        setWagmiConfig(createW3WWagmiConfig())
+      }
     })
 
     return () => {
@@ -41,5 +61,6 @@ export const useWagmiConfig = () => {
     }
   }, [setWagmiConfig])
 
-  return wagmiConfig
+  // Return atom value if set (e.g. after Binance override), otherwise the stable singleton
+  return wagmiConfig ?? configRef.current
 }

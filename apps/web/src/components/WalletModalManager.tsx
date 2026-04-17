@@ -5,7 +5,6 @@ import { useActiveChainId } from 'hooks/useActiveChainId'
 import useAuth from 'hooks/useAuth'
 
 import { ChainId } from '@pancakeswap/chains'
-import { useFirebaseAuth } from 'wallet/Privy/firebase'
 import { useCallback, useMemo } from 'react'
 import {
   logGTMConnectWalletSelectEvent,
@@ -61,13 +60,6 @@ const WalletModalManager: React.FC<{ isOpen: boolean; onDismiss?: () => void }> 
     [chainId],
   )
 
-  const { loginWithGoogle, loginWithX, loginWithDiscord, loginWithTelegram } = useFirebaseAuth()
-
-  const handleGoogleLogin = useCallback(() => loginWithGoogle(), [loginWithGoogle])
-  const handleXLogin = useCallback(() => loginWithX(), [loginWithX])
-  const handleTelegramLogin = useCallback(() => loginWithTelegram(), [loginWithTelegram])
-  const handleDiscordLogin = useCallback(() => loginWithDiscord(), [loginWithDiscord])
-
   const createEvmQrCode = useCallback(() => {
     return createQrCode(chainId || ChainId.BSC, connectAsync)
   }, [chainId, connectAsync])
@@ -88,10 +80,6 @@ const WalletModalManager: React.FC<{ isOpen: boolean; onDismiss?: () => void }> 
       onWalletConnectStartCallBack={handleWalletConnectStart}
       onWalletConnectCallBack={handleWalletConnect}
       onWalletConnectFailCallBack={handleWalletConnectFail}
-      onGoogleLogin={handleGoogleLogin}
-      onXLogin={handleXLogin}
-      onTelegramLogin={handleTelegramLogin}
-      onDiscordLogin={handleDiscordLogin}
       shouldShowMetamaskVersionWarning={shouldShowMetamaskVersionWarning}
     />
   )

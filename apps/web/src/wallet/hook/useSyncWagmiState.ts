@@ -1,11 +1,9 @@
-import { usePrivy } from '@privy-io/react-auth'
 import { useSetAtom } from 'jotai'
 import { useEffect, useRef } from 'react'
 
 import { getQueryChainId } from 'wallet/util/getQueryChainId'
 import { accountActiveChainAtom, currentConnectorAtom } from 'wallet/atoms/accountStateAtoms'
 import { useAccount } from 'wagmi'
-import { usePrivyWalletAddress } from 'wallet/Privy/hooks'
 import { useSwitchNetworkV2 } from './useSwitchNetworkV2'
 
 export function useSyncWagmiState() {
@@ -13,8 +11,6 @@ export function useSyncWagmiState() {
   const updAccountState = useSetAtom(accountActiveChainAtom)
   const setCurrentConnector = useSetAtom(currentConnectorAtom)
   const { switchNetwork } = useSwitchNetworkV2()
-  const { ready, authenticated } = usePrivy()
-  const { address: privyAddress, isLoading: isPrivyAddressLoading } = usePrivyWalletAddress()
 
   const oldWagmiChainId = useRef(wagmiChainId)
 
@@ -46,26 +42,9 @@ export function useSyncWagmiState() {
   }, [connector, setCurrentConnector])
 
   useEffect(() => {
-    if (!ready) {
-      return
-    }
-
-    if (authenticated) {
-      if (isPrivyAddressLoading) {
-        return
-      }
-
-      updAccountState((prev) => ({
-        ...prev,
-        account: privyAddress,
-      }))
-
-      return
-    }
-
     updAccountState((prev) => ({
       ...prev,
       account: evmAccount,
     }))
-  }, [ready, authenticated, privyAddress, isPrivyAddressLoading, evmAccount, connector, updAccountState])
+  }, [evmAccount, connector, updAccountState])
 }

@@ -23,7 +23,7 @@ export async function getTokenList(listUrl: string): Promise<TokenList | undefin
           const { errors } = validator
           throw new Error(`Validation failed after filtering: ${JSON.stringify(errors)}`)
         }
-        console.warn(`Pre-filter validation errors: ${JSON.stringify(preFilterErrors)}`)
+        // Token list pre-filter validation errors are expected for tokens with unicode names/symbols
       }
       return json as TokenList
     } catch (error) {

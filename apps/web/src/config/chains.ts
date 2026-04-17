@@ -1,8 +1,6 @@
 import { ChainId, chainNames } from '@pancakeswap/chains'
 import memoize from '@pancakeswap/utils/memoize'
-import {
-  Chain,
-} from 'wagmi/chains'
+import { Chain } from 'wagmi/chains'
 
 export const CHAIN_QUERY_NAME = chainNames
 
@@ -34,7 +32,7 @@ const elo: Chain = {
   },
   contracts: {
     multicall3: {
-      address: '0xe8254Ae39acfe27F99D309f68b8Fd87D7000Eddb',
+      address: '0x0065a282ad20D3EA71035503bbd5F6c2205f7a42',
     },
   },
   testnet: false,
@@ -44,13 +42,9 @@ const elo: Chain = {
  * Controls some L2 specific behavior, e.g. slippage tolerance, special UI behavior.
  * The expectation is that all of these networks have immediate transaction confirmation.
  */
-export const L2_CHAIN_IDS: ChainId[] = [
-  ChainId.ELO,
-]
+export const L2_CHAIN_IDS: ChainId[] = [ChainId.ELO]
 
-export const CHAINS: [Chain, ...Chain[]] = [
-  elo,
-]
+export const CHAINS: [Chain, ...Chain[]] = [elo]
 
 // Stub for code that still references Solana
 export const SOLANA_CHAIN = {

@@ -8,14 +8,12 @@ import {
   WalletSwitchChainError,
 } from '@pancakeswap/ui-wallets'
 import { ConnectData } from '@pancakeswap/ui-wallets/src/types'
-import { usePrivy } from '@privy-io/react-auth'
 import { useCallback } from 'react'
 import { useAppDispatch } from 'state'
 import { CONNECTOR_MAP } from 'utils/wagmi'
 import { ConnectorNotFoundError, SwitchChainNotSupportedError, useAccount, useConnect, useDisconnect } from 'wagmi'
 import { eip6963Providers } from 'wallet/WalletProvider'
 import { createEip6963Connector } from 'wallet/eip6963Connector'
-import { useFirebaseAuth } from '../wallet/Privy/firebase'
 import { clearUserStates } from '../utils/clearUserStates'
 import { useActiveChainId } from './useActiveChainId'
 
@@ -26,8 +24,6 @@ const useAuth = () => {
   const { disconnectAsync } = useDisconnect()
   const { chainId } = useActiveChainId()
   const { t } = useTranslation()
-  const { logout: privyLogout, ready, authenticated } = usePrivy()
-  const { signOutAndClearUserStates } = useFirebaseAuth()
 
   const login = useCallback(
     async (wallet: WalletConfigV3<EvmConnectorNames>): Promise<ConnectData | undefined> => {
@@ -78,12 +74,9 @@ const useAuth = () => {
   )
 
   const logout = useCallback(async () => {
-    console.log(`[wallet]`, 'logout', { chainId, authenticated, ready })
+    console.log(`[wallet]`, 'logout', { chainId })
     try {
-      if (authenticated && ready) {
-        await signOutAndClearUserStates()
-        await privyLogout()
-      } else await disconnectAsync()
+      await disconnectAsync()
     } catch (error) {
       console.error(error)
     } finally {
@@ -94,7 +87,7 @@ const useAuth = () => {
         window.localStorage.removeItem('wagmi.store')
       }
     }
-  }, [disconnectAsync, dispatch, chain?.id, chainId, authenticated, ready, signOutAndClearUserStates, privyLogout])
+  }, [disconnectAsync, dispatch, chain?.id, chainId])
 
   return { login, logout }
 }

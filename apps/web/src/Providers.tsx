@@ -3,15 +3,13 @@ import { DialogProvider, ModalProvider, UIKitProvider, dark, light } from '@panc
 import { Store } from '@reduxjs/toolkit'
 import { HydrationBoundary, QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { HistoryManagerProvider } from 'contexts/HistoryContext'
-import { FirebaseAuthProvider } from 'wallet/Privy/firebase'
-import { PrivyProvider } from 'wallet/Privy/privy'
-import { W3WConfigProvider } from 'contexts/W3WConfigContext'
 import { ThemeProvider as NextThemeProvider, useTheme as useNextTheme } from 'next-themes'
 import { useMemo } from 'react'
 import { Provider } from 'react-redux'
 import { WagmiProvider } from 'wagmi'
 import { createWagmiConfig } from 'utils/wagmi'
 import { WalletProvider } from 'wallet/WalletProvider'
+import { W3WConfigProvider } from 'wallet/W3WConfigContext'
 // Create a client
 const queryClient = new QueryClient()
 
@@ -32,27 +30,23 @@ const Providers: React.FC<
   }>
 > = ({ children, store, dehydratedState }) => {
   return (
-    <FirebaseAuthProvider>
-      <Provider store={store}>
-        <LanguageProvider>
-          <QueryClientProvider client={queryClient}>
-            <HydrationBoundary state={dehydratedState}>
-              <NextThemeProvider>
-                <StyledUIKitProvider>
-                  <PrivyProvider>
-                    <WalletProvider>
-                      <HistoryManagerProvider>
-                        <ModalProvider portalProvider={DialogProvider}>{children}</ModalProvider>
-                      </HistoryManagerProvider>
-                    </WalletProvider>
-                  </PrivyProvider>
-                </StyledUIKitProvider>
-              </NextThemeProvider>
-            </HydrationBoundary>
-          </QueryClientProvider>
-        </LanguageProvider>
-      </Provider>
-    </FirebaseAuthProvider>
+    <Provider store={store}>
+      <LanguageProvider>
+        <QueryClientProvider client={queryClient}>
+          <HydrationBoundary state={dehydratedState}>
+            <NextThemeProvider>
+              <StyledUIKitProvider>
+                <WalletProvider>
+                  <HistoryManagerProvider>
+                    <ModalProvider portalProvider={DialogProvider}>{children}</ModalProvider>
+                  </HistoryManagerProvider>
+                </WalletProvider>
+              </StyledUIKitProvider>
+            </NextThemeProvider>
+          </HydrationBoundary>
+        </QueryClientProvider>
+      </LanguageProvider>
+    </Provider>
   )
 }
 

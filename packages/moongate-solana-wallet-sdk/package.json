@@ -1,0 +1,7 @@
+{
+  "name": "@moongate/solana-wallet-sdk",
+  "version": "1.0.0",
+  "description": "Placeholder package for workspace dependency",
+  "main": "index.js",
+  "private": true
+}

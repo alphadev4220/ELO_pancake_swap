@@ -1,4 +1,4 @@
-import { chainFullNames, getChainName, isEvm } from '@pancakeswap/chains'
+import { getChainName, isEvm } from '@pancakeswap/chains'
 import { useTranslation } from '@pancakeswap/localization'
 import { useToast } from '@pancakeswap/uikit'
 import { EvmConnectorNames, isPhantomEvmChainSupported } from '@pancakeswap/ui-wallets'
@@ -13,7 +13,6 @@ import { Connector, useAccount, useSwitchChain } from 'wagmi'
 import { accountActiveChainAtom } from 'wallet/atoms/accountStateAtoms'
 import { SwitchChainRequest, switchChainUpdatingAtom } from 'wallet/atoms/switchChainRequestAtom'
 import { normalizeChainId } from 'wallet/util/normalizeChainId'
-import { PrivySwitchChainError } from 'wallet/util/PrivySwitchChainError'
 
 type SwitchFrom = 'wagmi' | 'url' | 'switch' | 'connect'
 export interface SwitchChainOption {
@@ -243,13 +242,7 @@ const useProcessSwitchChainRequest = () => {
         return true
       } catch (error) {
         console.log(`[chain]`, 'switch error', error)
-        if (error instanceof PrivySwitchChainError) {
-          const chainName = error.chainId ? chainFullNames[error.chainId] ?? '' : ''
-
-          toastError(t('Error'), t('Social login with %chainName% is not supported.', { chainName }))
-        } else {
-          toastError(t('Error'), t('An unexpected error occurred while switching chains. Please try again.'))
-        }
+        toastError(t('Error'), t('An unexpected error occurred while switching chains. Please try again.'))
         return false
       } finally {
         setSwitching(false)
